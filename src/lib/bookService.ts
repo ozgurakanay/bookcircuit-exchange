@@ -1,5 +1,5 @@
 import { OpenLibraryBook, OpenLibraryResponse, Book, BookCondition } from './types';
-import { supabase } from './supabase';
+import { supabase, verifySessionWithServer, verifyDatabaseAccess as supabaseVerifyAccess } from './supabase';
 
 // Base URL for Open Library API
 const OPEN_LIBRARY_API_URL = 'https://openlibrary.org';
@@ -306,129 +306,45 @@ export const getRecentlyAddedBooks = async (limit: number = 8): Promise<Book[]> 
   }
 };
 
-// Search books by various parameters
-export const searchBooksByParams = async (
-  params: {
-    title?: string;
-    author?: string;
-    postal_code?: string;
-    radius?: number;
-    latitude?: number;
-    longitude?: number;
-  }
-): Promise<Book[]> => {
-  try {
-    // For location-based search, use the get_books_with_distances RPC function
-    if (params.latitude && params.longitude && params.radius) {
-      // Convert radius from km to meters for the query
-      const radiusInMeters = params.radius * 1000;
-      
-      console.log('Performing geographic search with params:', {
-        lat: params.latitude,
-        lng: params.longitude,
-        max_distance_km: params.radius
-      });
-      
-      // Use the improved debugging function that returns distances
-      const { data, error } = await supabase.rpc('get_books_with_distances', {
-        lat: params.latitude,
-        lng: params.longitude,
-        max_distance_km: params.radius
-      });
-      
-      if (error) {
-        console.error('Error performing geographic search:', error);
-        
-        // Fall back to regular search if geographic search fails
-        return fallbackSearch(params);
-      } else {
-        console.log('Geographic search succeeded, returned data:', data);
-        
-        // Process the data to merge it with regular book fields
-        if (data && data.length > 0) {
-          // Extract book IDs for detailed lookup
-          const bookIds = data.map(item => item.id);
-          
-          // Fetch full book details
-          const { data: bookData, error: bookError } = await supabase
-            .from('books')
-            .select('*')
-            .in('id', bookIds);
-            
-          if (bookError || !bookData) {
-            console.error('Error fetching detailed book data:', bookError);
-            return [];
-          }
-          
-          // Create a map of distance data by book ID
-          const distanceMap: Record<string, { distance_meters: number, distance_km: number }> = {};
-          data.forEach(item => {
-            distanceMap[item.id] = {
-              distance_meters: item.distance_meters,
-              distance_km: item.distance_km
-            };
-          });
-          
-          // Merge distance data with book data and sort by distance
-          const booksWithDistances = bookData.map(book => ({
-            ...book,
-            distance_meters: distanceMap[book.id]?.distance_meters,
-            distance_km: distanceMap[book.id]?.distance_km
-          }));
-          
-          // Sort by distance
-          return booksWithDistances.sort((a, b) => 
-            (a.distance_meters || Infinity) - (b.distance_meters || Infinity)
-          );
-        }
-        return [];
-      }
-    } else {
-      // For non-geographic searches, use regular query
-      return fallbackSearch(params);
-    }
-  } catch (error) {
-    console.error('Error searching books:', error);
-    return [];
-  }
-};
-
-// Helper function for regular search (without geographic component)
-const fallbackSearch = async (params: {
-  title?: string;
-  author?: string;
-  postal_code?: string;
+// Search books by location parameters
+export const searchBooksByParams = async ({ 
+  latitude, 
+  longitude, 
+  radius = 5, // Default 5km radius
+  limit = 20 
+}: { 
+  latitude: number, 
+  longitude: number, 
+  radius?: number, 
+  limit?: number 
 }): Promise<Book[]> => {
   try {
-    // Start building the query
-    let query = supabase.from('books').select('*');
-
-    // Apply filters if provided
-    if (params.title) {
-      query = query.ilike('title', `%${params.title}%`);
+    // Verify database access before proceeding
+    const dbAccessCheck = await verifyDatabaseAccess();
+    if (!dbAccessCheck.success) {
+      throw new Error(dbAccessCheck.message);
     }
     
-    if (params.author) {
-      query = query.ilike('author', `%${params.author}%`);
-    }
-    
-    if (params.postal_code) {
-      // Fallback to exact postal code search
-      query = query.eq('postal_code', params.postal_code);
-    }
-
-    // Execute the query
-    const { data, error } = await query.order('created_at', { ascending: false });
+    // Call the stored procedure to find nearby books
+    const { data, error } = await supabase.rpc(
+      'get_books_with_distances',
+      {
+        lat: latitude,
+        lng: longitude,
+        max_distance_km: radius,
+        max_results: limit
+      }
+    );
     
     if (error) {
-      console.error('Error searching books:', error);
-      return [];
+      console.error('Error searching books by location:', error);
+      throw error;
     }
     
-    return data || [];
+    return data as Book[];
   } catch (error) {
-    console.error('Error in fallback search:', error);
-    return [];
+    console.error('Exception in searchBooksByParams:', error);
+    throw error;
   }
 };
 
@@ -531,56 +447,57 @@ export const getUserRequestedBooks = async (userId: string): Promise<Book[]> => 
   }
 };
 
-// Add a new test function to check geography generation
-export const testGeographyColumn = async (): Promise<{ success: boolean; message: string }> => {
+// Function to verify database access and initialize geography
+export const verifyDatabaseAccess = async (): Promise<{ success: boolean; message: string }> => {
   try {
-    // First, query a book to see if it has a location column populated
-    const { data: books, error: booksError } = await supabase
-      .from('books')
-      .select('*')
-      .limit(5);
-      
-    if (booksError) throw booksError;
+    // Use our simplified supabase database verification utility
+    const result = await supabaseVerifyAccess();
     
-    console.log('Sample books to check location column:', books);
-    
-    // Then try to query using ST_DWithin to see if PostGIS is working
-    if (books && books.length > 0) {
-      const testLat = 37.7749;
-      const testLng = -122.4194;
-      const testRadius = 100000; // 100km in meters
-      
-      const { data: spatialBooks, error: spatialError } = await supabase.rpc(
-        'books_within_distance',
-        {
-          lat: testLat,
-          lng: testLng,
-          distance_meters: testRadius
-        }
-      );
-      
-      if (spatialError) {
-        console.error('Spatial query error:', spatialError);
-        return { 
-          success: false, 
-          message: `Spatial query failed: ${spatialError.message}` 
-        };
-      }
-      
-      console.log('Spatial query results:', spatialBooks);
-      
+    if (!result.success) {
       return { 
-        success: true, 
-        message: `Test complete. Found ${spatialBooks?.length || 0} books within 100km of San Francisco` 
+        success: false, 
+        message: result.message || 'Database verification failed'
       };
     }
     
-    return { success: false, message: 'No books found to test' };
+    // Verify PostGIS capability specifically
+    try {
+      // Try a basic geographic query without requiring actual data
+      const { error: geoError } = await supabase.rpc('books_within_distance', {
+        lat: 0,
+        lng: 0,
+        distance_meters: 1
+      });
+      
+      // We expect a not-found error but not a function/syntax error
+      if (geoError && (
+          geoError.message.includes('function') || 
+          geoError.message.includes('syntax') || 
+          geoError.message.includes('permission')
+      )) {
+        console.error('PostGIS function error during verification:', geoError);
+        return { 
+          success: false, 
+          message: 'Geographic function error: ' + geoError.message 
+        };
+      }
+      
+      return { 
+        success: true, 
+        message: 'Database access and geographic functions verified.' 
+      };
+    } catch (geoError) {
+      console.error('Exception during PostGIS verification:', geoError);
+      return { 
+        success: false, 
+        message: 'Geographic function exception: ' + (geoError instanceof Error ? geoError.message : String(geoError))
+      };
+    }
   } catch (error) {
-    console.error('Error testing geography column:', error);
+    console.error('Error verifying database access:', error);
     return { 
       success: false, 
-      message: error instanceof Error ? error.message : 'Unknown error occurred' 
+      message: 'Verification error: ' + (error instanceof Error ? error.message : 'Unknown error occurred') 
     };
   }
 }; 

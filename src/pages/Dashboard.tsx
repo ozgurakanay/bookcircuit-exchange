@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { BookOpen, LogOut, CheckCircle2, UserCircle, PlusCircle, Search, MessageSquare, Heart } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { BookOpen, LogOut, CheckCircle2, UserCircle, PlusCircle, Search, MessageSquare, Heart, ShieldCheck } from 'lucide-react';
 import Navbar from '@/components/ui-custom/Navbar';
 import Footer from '@/components/ui-custom/Footer';
 import Button from '@/components/ui-custom/Button';
@@ -11,7 +11,7 @@ import { getUserBooks } from '@/lib/bookService';
 import { Book } from '@/lib/types';
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, emergencyReset } = useAuth();
   const navigate = useNavigate();
   const [supabaseConnected, setSupabaseConnected] = useState(false);
   const [connectionTested, setConnectionTested] = useState(false);
@@ -68,8 +68,25 @@ const Dashboard = () => {
   }, [user]);
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
+    try {
+      await signOut();
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.error('Error during sign out:', error);
+      // Even if there's an error, try to navigate away
+      navigate('/', { replace: true });
+    }
+  };
+
+  const handleEmergencyReset = async () => {
+    const confirmReset = window.confirm(
+      "WARNING: This will sign you out and clear ALL browser data related to your account. " +
+      "Use this only if you're experiencing persistent login issues. Continue?"
+    );
+    
+    if (confirmReset) {
+      await emergencyReset();
+    }
   };
 
   return (
@@ -190,13 +207,42 @@ const Dashboard = () => {
             </div>
 
             <div className="mb-4">
-              <a href="/test-geography" className="text-blue-500 hover:underline">
-                Test Geography Function
-              </a>
+              <Link 
+                to="/test-geography" 
+                className="text-blue-500 hover:underline flex items-center"
+                state={{ fromDashboard: true }}
+              >
+                <span>Test Geography Function</span>
+                <span className="text-xs text-gray-500 ml-2">(Beta)</span>
+              </Link>
             </div>
           </div>
         </div>
       </main>
+      
+      <div className="max-w-5xl mx-auto mt-8">
+        <div className="border-t border-gray-200 pt-4">
+          <details className="group">
+            <summary className="flex items-center justify-between cursor-pointer">
+              <h5 className="text-sm font-medium text-red-500">Troubleshooting Tools</h5>
+              <span className="text-red-500 text-xs">⚠️ Advanced</span>
+            </summary>
+            <div className="mt-4 p-4 bg-red-50 rounded-lg">
+              <h6 className="text-sm font-medium text-red-800 mb-2">Account Reset</h6>
+              <p className="text-xs text-red-700 mb-4">
+                If you're experiencing persistent login issues, you can try this emergency reset.
+                This will sign you out and clear all browser data related to your account.
+              </p>
+              <button 
+                onClick={handleEmergencyReset}
+                className="text-xs bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+              >
+                Emergency Account Reset
+              </button>
+            </div>
+          </details>
+        </div>
+      </div>
       
       <Footer />
     </div>

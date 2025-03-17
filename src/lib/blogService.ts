@@ -14,7 +14,7 @@ export const getAllBlogPosts = async (): Promise<BlogPost[]> => {
       throw error;
     }
     
-    return data as BlogPost[];
+    return processPostsImages(data as BlogPost[]);
   } catch (error) {
     console.error('Error fetching blog posts:', error);
     return [];
@@ -35,11 +35,42 @@ export const getFeaturedBlogPosts = async (limit: number = 3): Promise<BlogPost[
       throw error;
     }
     
-    return data as BlogPost[];
+    return processPostsImages(data as BlogPost[]);
   } catch (error) {
     console.error('Error fetching featured blog posts:', error);
     return [];
   }
+};
+
+// Process post images to ensure they're valid
+const processPostsImages = (posts: BlogPost[]): BlogPost[] => {
+  return posts.map(post => {
+    // Ensure the featured image URL has proper parameters
+    if (post.featured_image_url) {
+      try {
+        // Make sure Unsplash URLs have the right parameters
+        if (post.featured_image_url.includes('unsplash.com')) {
+          const url = new URL(post.featured_image_url);
+          
+          // Ensure we have auto=format and proper quality
+          if (!url.searchParams.has('auto')) {
+            url.searchParams.set('auto', 'format');
+          }
+          
+          if (!url.searchParams.has('q')) {
+            url.searchParams.set('q', '80');
+          }
+          
+          // Return the improved URL
+          post.featured_image_url = url.toString();
+        }
+      } catch (e) {
+        console.warn('Failed to process image URL for post:', post.title);
+      }
+    }
+    
+    return post;
+  });
 };
 
 // Get a blog post by slug
@@ -56,7 +87,8 @@ export const getBlogPostBySlug = async (slug: string): Promise<BlogPost | null> 
       throw error;
     }
     
-    return data as BlogPost;
+    const posts = processPostsImages([data as BlogPost]);
+    return posts[0];
   } catch (error) {
     console.error(`Error fetching blog post with slug ${slug}:`, error);
     return null;

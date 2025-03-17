@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   website TEXT,
   avatar_url TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  email TEXT
 );
 
 -- Set up Row Level Security (RLS)

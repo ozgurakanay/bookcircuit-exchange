@@ -4,7 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import AdminRoute from "@/components/auth/AdminRoute";
 import Index from "./pages/Index";
 import GetStarted from "./pages/GetStarted";
 import SignIn from "./pages/SignIn";
@@ -21,6 +22,7 @@ import TestGeography from "./pages/TestGeography";
 import SimpleTest from "./pages/SimpleTest";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +61,12 @@ const App = () => (
               <ProtectedRoute>
                 <EditBook />
               </ProtectedRoute>
+            } />
+            {/* Admin Route */}
+            <Route path="/admin" element={
+              <AdminRoute>
+                <Admin />
+              </AdminRoute>
             } />
             <Route path="/simple-test" element={<SimpleTest />} />
             <Route path="/test-geography" element={
