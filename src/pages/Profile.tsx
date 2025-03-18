@@ -5,7 +5,7 @@ import Navbar from '@/components/ui-custom/Navbar';
 import Footer from '@/components/ui-custom/Footer';
 import Button from '@/components/ui-custom/Button';
 import { useAuth } from '@/context/AuthContext';
-import { supabase, verifySessionWithServer } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { toast } from "@/components/ui/use-toast";
 
 interface UserProfile {
@@ -19,14 +19,13 @@ interface UserProfile {
 }
 
 const Profile = () => {
-  const { user, profile: authProfile, refreshProfile } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const [sessionVerified, setSessionVerified] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
-    id: '',
+    id: user?.id || '',
     full_name: '',
     bio: '',
     location: '',
@@ -35,170 +34,45 @@ const Profile = () => {
     avatar_url: null
   });
 
-  // First verify session is valid
   useEffect(() => {
-    const verifySession = async () => {
-      console.log("Profile - Verifying session");
-      
-      if (!user) {
-        // Not logged in, redirect to login
-        console.log("Profile - No user in context, redirecting to signin");
-        navigate('/signin', { replace: true });
-        return;
-      }
-      
-      try {
-        const { valid, error } = await verifySessionWithServer();
-        
-        if (!valid) {
-          console.error("Profile - Session verification failed:", error);
-          toast({
-            title: "Session Error",
-            description: "Your session appears to be invalid. Please sign in again.",
-            variant: "destructive"
-          });
-          
-          // Clear the invalid session
-          await supabase.auth.signOut();
-          navigate('/signin', { replace: true });
-          return;
-        }
-        
-        console.log("Profile - Session verified successfully");
-        setSessionVerified(true);
-      } catch (err) {
-        console.error("Profile - Error verifying session:", err);
-        toast({
-          title: "Session Error",
-          description: "Failed to verify your session. Please sign in again.",
-          variant: "destructive"
-        });
-        navigate('/signin', { replace: true });
-      }
-    };
-    
-    verifySession();
-  }, [user, navigate]);
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
 
-  // Handle authentication and profile data once session verified
-  useEffect(() => {
-    const initProfile = async () => {
-      if (!user || !sessionVerified) {
-        return; // Wait until session is verified
-      }
-      
+  const fetchProfile = async () => {
+    try {
       setLoading(true);
       
-      // Set initial profile data from auth context if available
-      if (authProfile) {
-        console.log("Using profile data from auth context");
-        setProfile({
-          id: authProfile.id,
-          full_name: authProfile.full_name || '',
-          bio: authProfile.bio || '',
-          location: authProfile.location || '',
-          favorite_genre: authProfile.favorite_genre || '',
-          website: authProfile.website || '',
-          avatar_url: authProfile.avatar_url || null
-        });
-        setLoading(false);
-        return;
-      }
-      
-      // Otherwise fetch profile directly
-      try {
-        console.log("Fetching profile directly for user:", user.id);
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        
-        if (error) {
-          console.error('Error fetching profile:', error.message);
-          
-          // If profile doesn't exist, create a new one
-          if (error.code === 'PGRST116') {
-            await createProfile(user.id);
-            return;
-          }
-          
-          toast({
-            title: "Error loading profile",
-            description: error.message,
-            variant: "destructive"
-          });
-        } else if (data) {
-          console.log("Profile data received:", data);
-          setProfile({
-            id: user.id,
-            full_name: data.full_name || '',
-            bio: data.bio || '',
-            location: data.location || '',
-            favorite_genre: data.favorite_genre || '',
-            website: data.website || '',
-            avatar_url: data.avatar_url
-          });
-          
-          // Update auth context
-          refreshProfile();
-        }
-      } catch (error: any) {
-        console.error('Error:', error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    initProfile();
-  }, [user, authProfile, navigate, refreshProfile, sessionVerified]);
-
-  // Create a new profile for the user
-  const createProfile = async (userId: string) => {
-    try {
-      console.log("Creating new profile for user:", userId);
-      
-      const newProfile = {
-        id: userId,
-        full_name: '',
-        bio: '',
-        location: '',
-        favorite_genre: '',
-        website: '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      
+      // Check if profiles table exists, if not show a message
       const { data, error } = await supabase
         .from('profiles')
-        .insert([newProfile])
-        .select()
+        .select('*')
+        .eq('id', user?.id)
         .single();
       
-      if (error) {
-        console.error('Error creating profile:', error.message);
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching profile:', error);
         toast({
-          title: "Error creating profile",
+          title: "Error fetching profile",
           description: error.message,
           variant: "destructive"
         });
-      } else if (data) {
-        console.log("New profile created:", data);
+      }
+      
+      if (data) {
         setProfile({
-          id: userId,
-          full_name: '',
-          bio: '',
-          location: '',
-          favorite_genre: '',
-          website: '',
-          avatar_url: null
+          id: user?.id || '',
+          full_name: data.full_name || '',
+          bio: data.bio || '',
+          location: data.location || '',
+          favorite_genre: data.favorite_genre || '',
+          website: data.website || '',
+          avatar_url: data.avatar_url
         });
-        
-        // Update auth context
-        refreshProfile();
       }
     } catch (error: any) {
-      console.error('Error creating profile:', error.message);
+      console.error('Error:', error.message);
     } finally {
       setLoading(false);
     }
@@ -212,10 +86,7 @@ const Profile = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user) {
-      navigate('/signin');
-      return;
-    }
+    if (!user) return;
     
     try {
       setUpdating(true);
@@ -234,9 +105,6 @@ const Profile = () => {
         });
       
       if (error) throw error;
-      
-      // Update auth context with new profile data
-      refreshProfile();
       
       toast({
         title: "Profile updated",

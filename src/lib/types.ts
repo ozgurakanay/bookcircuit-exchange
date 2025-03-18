@@ -7,9 +7,9 @@ export type Profile = {
   favorite_genre?: string;
   website?: string;
   avatar_url?: string;
-  email?: string;
   created_at: string;
   updated_at: string;
+  role: string; // 'user' or 'admin'
 };
 
 export type BookCondition = 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor';

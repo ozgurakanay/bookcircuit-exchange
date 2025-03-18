@@ -1,20 +1,38 @@
 import React from 'react';
-import { ProtectedRoute } from './ProtectedRoute';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { Loader2 } from 'lucide-react';
 
 interface AdminRouteProps {
   children: React.ReactNode;
 }
 
-// For now, AdminRoute is just a wrapper over ProtectedRoute
-// In the future, this can be enhanced to check for admin roles
 const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
-  // Simply use the existing ProtectedRoute for now
-  // When user roles are implemented, we can add additional checks
-  return (
-    <ProtectedRoute>
-      {children}
-    </ProtectedRoute>
-  );
+  const { user, loading, isAdmin } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-book-accent mr-2" />
+        <span className="text-book-dark">Loading user data...</span>
+      </div>
+    );
+  }
+
+  // Redirect to sign in if not authenticated
+  if (!user) {
+    console.log("User not authenticated, redirecting to signin");
+    return <Navigate to="/signin" replace />;
+  }
+
+  // Redirect to dashboard if authenticated but not an admin
+  if (!isAdmin) {
+    console.log("User is not an admin, redirecting to dashboard");
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  console.log("Admin authenticated, rendering protected admin content");
+  return <>{children}</>;
 };
 
 export default AdminRoute; 
