@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Button from './Button';
@@ -33,11 +32,11 @@ const Hero = () => {
   }, []);
 
   return (
-    <div ref={heroRef} className="relative min-h-screen overflow-hidden hero-gradient">
+    <div ref={heroRef} className="relative min-h-screen overflow-hidden bg-book-paper">
       {/* Decorative blurred circles */}
       <div className="absolute pointer-events-none">
         <div className="hero-blur-1 absolute top-1/4 -left-24 w-96 h-96 bg-book-accent/20 rounded-full filter blur-3xl opacity-60 transition-transform duration-700"></div>
-        <div className="hero-blur-2 absolute bottom-1/4 -right-24 w-96 h-96 bg-purple-400/20 rounded-full filter blur-3xl opacity-60 transition-transform duration-700"></div>
+        <div className="hero-blur-2 absolute bottom-1/4 -right-24 w-96 h-96 bg-book-light/20 rounded-full filter blur-3xl opacity-60 transition-transform duration-700"></div>
       </div>
       
       {/* Hero content */}
@@ -50,13 +49,13 @@ const Hero = () => {
           </div>
           
           <div className="animate-slide-up opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-serif tracking-tight mb-6 md:mb-8">
-              Share Books, <span className="text-gradient">Connect</span> with Readers Nearby
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-serif tracking-tight mb-6 md:mb-8 text-book-leather">
+              Share Books, <span className="text-book-accent">Connect</span> with Readers Nearby
             </h1>
           </div>
           
           <div className="animate-slide-up opacity-0" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
-            <p className="text-lg md:text-xl text-book-dark/80 max-w-3xl mx-auto mb-8 md:mb-10">
+            <p className="text-lg md:text-xl text-book-dark max-w-3xl mx-auto mb-8 md:mb-10">
               Discover a community of book lovers around you. Trade books you've read for ones you want to read, 
               build your personal library, and connect with fellow readers in your neighborhood.
             </p>
@@ -65,12 +64,12 @@ const Hero = () => {
           <div className="animate-slide-up opacity-0" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
             <div className="flex flex-col sm:flex-row justify-center gap-4 mb-10">
               <Link to="/get-started">
-                <Button size="lg" variant="primary">
+                <Button size="lg" variant="primary" className="bg-book-leather text-white hover:bg-book-leather/90">
                   Get Started — It's Free
                 </Button>
               </Link>
               <a href="#how-it-works">
-                <Button size="lg" variant="outline">
+                <Button size="lg" variant="outline" className="border-book-dark text-book-dark hover:bg-book-dark/10">
                   Learn How It Works
                 </Button>
               </a>
@@ -80,7 +79,7 @@ const Hero = () => {
           <div className="animate-slide-up opacity-0" style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}>
             <div className="glass-card p-4 md:p-8 rounded-2xl shadow-xl mx-auto max-w-4xl">
               <div className="aspect-video relative overflow-hidden rounded-lg">
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800/5 to-gray-900/20">
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-book-leather/40 to-book-leather/60">
                   <div className="text-center p-6">
                     <div className="w-16 h-16 mx-auto bg-white/90 rounded-full flex items-center justify-center shadow-lg mb-4">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-book-accent">
@@ -88,12 +87,12 @@ const Hero = () => {
                       </svg>
                     </div>
                     <h4 className="text-xl font-medium text-white">App Preview</h4>
-                    <p className="text-white/80 text-sm mt-2">See BookCircuit in action</p>
+                    <p className="text-white/90 text-sm mt-2">See Turtle Turning Pages in action</p>
                   </div>
                 </div>
                 <img 
                   src="https://images.unsplash.com/photo-1549122728-f519709caa9c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
-                  alt="BookCircuit App Preview" 
+                  alt="Turtle Turning Pages App Preview" 
                   className="w-full h-full object-cover opacity-90"
                 />
               </div>

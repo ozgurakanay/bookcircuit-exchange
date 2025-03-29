@@ -140,7 +140,7 @@ const BookDetail = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>{book.title} | BookCircuit</title>
+        <title>{book.title} | Turtle Turning Pages</title>
       </Helmet>
       
       <Navbar />

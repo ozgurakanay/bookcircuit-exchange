@@ -17,7 +17,6 @@ import Home from "./pages/Home";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
-import TestGeography from "./pages/TestGeography";
 import SimpleTest from "./pages/SimpleTest";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
@@ -74,11 +73,6 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/simple-test" element={<SimpleTest />} />
-            <Route path="/test-geography" element={
-              <ProtectedRoute>
-                <TestGeography />
-              </ProtectedRoute>
-            } />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />

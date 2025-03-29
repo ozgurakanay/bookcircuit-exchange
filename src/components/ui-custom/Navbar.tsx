@@ -130,8 +130,8 @@ const Navbar = () => {
       <div className="container px-4 md:px-6 mx-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <span className="text-xl md:text-2xl font-bold font-serif text-book-dark">BookCircuit</span>
+            <Link to={user ? "/home" : "/"} className="flex items-center space-x-2">
+              <span className="text-xl md:text-2xl font-bold font-serif text-book-dark">Turtle Turning Pages</span>
             </Link>
           </div>
 
@@ -224,8 +224,8 @@ const Navbar = () => {
         <div className="flex flex-col h-full p-4">
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center">
-              <Link to="/" className="flex items-center space-x-2" onClick={() => setMobileMenuOpen(false)}>
-                <span className="text-xl font-bold font-serif text-book-dark">BookCircuit</span>
+              <Link to={user ? "/home" : "/"} className="flex items-center space-x-2" onClick={() => setMobileMenuOpen(false)}>
+                <span className="text-xl font-bold font-serif text-book-dark">Turtle Turning Pages</span>
               </Link>
             </div>
             <button

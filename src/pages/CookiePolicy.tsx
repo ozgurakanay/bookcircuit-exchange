@@ -16,7 +16,7 @@ const CookiePolicy = () => {
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">1. Introduction</h2>
             <p>
-              This Cookie Policy explains how BookCircuit GmbH ("we", "our", or "us") uses cookies and similar technologies when you visit our website. This policy provides you with clear and comprehensive information about the cookies we use and the purposes for which we use them.
+              This Cookie Policy explains how Turtle Turning Pages GmbH ("we", "our", or "us") uses cookies and similar technologies when you visit our website. This policy provides you with clear and comprehensive information about the cookies we use and the purposes for which we use them.
             </p>
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">2. What Are Cookies?</h2>
@@ -155,11 +155,11 @@ const CookiePolicy = () => {
               If you have any questions about our Cookie Policy, please contact us at:
             </p>
             <p>
-              BookCircuit GmbH<br />
+              Turtle Turning Pages GmbH<br />
               Musterstraße 123<br />
               10115 Berlin<br />
               Germany<br />
-              Email: privacy@bookcircuit.com
+              Email: privacy@turtleturningpages.com
             </p>
           </div>
         </div>

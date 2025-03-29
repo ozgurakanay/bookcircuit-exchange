@@ -9,17 +9,17 @@ import { CheckCheck } from 'lucide-react'; // Import the icon
 
 const MessageItem = ({ message, isOwnMessage }) => {
   return (
-    <div className={`flex mb-1 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
-      <div className={`flex flex-col max-w-[70%] ${isOwnMessage ? 'items-end' : 'items-start'}`}>
+    <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} p-1.5`}>
+      <div className={`flex flex-col max-w-[75%] md:max-w-[65%] ${isOwnMessage ? 'items-end' : 'items-start'} p-1.5 rounded-lg bg-gray-50`}>
         {/* Message bubble */}
-        <div 
-          className={`px-3 py-2 rounded-lg shadow-sm ${
-            isOwnMessage 
-              ? 'bg-primary text-primary-foreground rounded-tr-none' 
-              : 'bg-card border border-border text-card-foreground rounded-tl-none'
+        <div
+          className={`px-3 py-2 rounded-lg shadow-sm text-sm break-words ${
+            isOwnMessage
+              ? 'bg-accent text-white rounded-br-none'
+              : 'bg-gray-100 text-gray-800 rounded-bl-none'
           }`}
         >
-          <p className="whitespace-pre-wrap break-words text-sm">{message.content}</p>
+          <p className="whitespace-pre-wrap">{message.content}</p>
           
           {/* Remove attachment logic */}
           {/* 
@@ -34,7 +34,7 @@ const MessageItem = ({ message, isOwnMessage }) => {
         </div>
         
         {/* Timestamp and status */}
-        <div className="flex items-center mt-1 text-xs text-muted-foreground">
+        <div className="flex items-center mt-1 text-xs text-gray-400">
           <span>{formatTimeCET(message.created_at)}</span>
           
           {/* Remove edited logic */}
@@ -45,7 +45,7 @@ const MessageItem = ({ message, isOwnMessage }) => {
           */}
           
           {isOwnMessage && (
-            <CheckCheck className="ml-1.5 h-4 w-4 text-primary" />
+            <CheckCheck className="ml-1.5 h-3.5 w-3.5 text-gray-400" />
           )}
         </div>
       </div>

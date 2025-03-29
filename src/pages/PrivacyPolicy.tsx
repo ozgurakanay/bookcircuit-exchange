@@ -16,7 +16,7 @@ const PrivacyPolicy = () => {
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">1. Introduction</h2>
             <p>
-              BookCircuit ("we", "our", or "us") is committed to protecting your personal data and respecting your privacy. This Privacy Policy explains how we collect, use, and protect your personal information when you use our website and services.
+              Turtle Turning Pages ("we", "our", or "us") is committed to protecting your personal data and respecting your privacy. This Privacy Policy explains how we collect, use, and protect your personal information when you use our website and services.
             </p>
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">2. Data Controller</h2>
@@ -24,8 +24,8 @@ const PrivacyPolicy = () => {
               The data controller responsible for your personal data is:
             </p>
             <p>
-              BookCircuit<br />
-              Email: privacy@bookcircuit.com
+              Turtle Turning Pages<br />
+              Email: privacy@turtleturningpages.com
             </p>
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">3. Data We Collect</h2>
@@ -104,11 +104,11 @@ const PrivacyPolicy = () => {
               If you have any questions about this Privacy Policy, please contact us at:
             </p>
             <p>
-              BookCircuit GmbH<br />
+              Turtle Turning Pages GmbH<br />
               Musterstraße 123<br />
               10115 Berlin<br />
               Germany<br />
-              Email: privacy@bookcircuit.com
+              Email: privacy@turtleturningpages.com
             </p>
           </div>
         </div>

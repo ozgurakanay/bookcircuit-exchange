@@ -31,7 +31,7 @@ const Blog = () => {
       <Navbar />
       
       <main className="flex-grow container mx-auto px-4 pt-36 pb-16">
-        <h1 className="text-3xl md:text-4xl font-bold font-serif mb-8">BookCircuit Blog</h1>
+        <h1 className="text-3xl md:text-4xl font-bold font-serif mb-8">Turtle Turning Pages Blog</h1>
         
         <p className="text-lg text-muted-foreground mb-10 max-w-3xl">
           Thoughts and stories about book trading, community building, and the future of reading.

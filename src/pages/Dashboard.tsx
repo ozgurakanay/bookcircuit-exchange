@@ -239,10 +239,6 @@ const Dashboard = () => {
             <div className="glass-card rounded-xl p-8 shadow-lg mb-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-semibold">Welcome{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ''}!</h2>
-                <Button onClick={handleSignOut} variant="outline" className="flex items-center gap-2">
-                  <LogOut size={16} />
-                  Sign Out
-                </Button>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -287,7 +283,7 @@ const Dashboard = () => {
                     <h3 className="font-medium">Requested Books</h3>
                     <p className="text-sm text-muted-foreground">You've requested {requestedBooks.length} books</p>
                   </div>
-                  <Button onClick={() => navigate('/search')} variant="ghost" className="ml-auto">Find More</Button>
+                  <Button onClick={() => navigate('/search')} variant="ghost" className="ml-auto">See</Button>
                 </div>
                 
                 <div className="flex items-center gap-4 p-4 rounded-lg bg-purple-500/10">
@@ -315,23 +311,7 @@ const Dashboard = () => {
                 )}
               </div>
               
-              {connectionTested && (
-                <div className={`mt-6 p-4 rounded-lg ${supabaseConnected ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
-                  <div className="flex items-center gap-2">
-                    {supabaseConnected ? (
-                      <>
-                        <CheckCircle2 size={20} className="text-green-500" />
-                        <span className="font-medium">Connected to Supabase</span>
-                      </>
-                    ) : (
-                      <>
-                        <div className="text-red-500">⚠️</div>
-                        <span className="font-medium">Not connected to Supabase</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
+              
             </div>
             
             {/* Books Section */}
@@ -433,12 +413,6 @@ const Dashboard = () => {
                   </Button>
                 </div>
               )}
-            </div>
-
-            <div className="mb-4">
-              <a href="/test-geography" className="text-blue-500 hover:underline">
-                Test Geography Function
-              </a>
             </div>
           </div>
         </div>

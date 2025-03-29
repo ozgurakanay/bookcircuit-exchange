@@ -16,19 +16,19 @@ const TermsOfService = () => {
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">1. Introduction</h2>
             <p>
-              Welcome to BookCircuit. These Terms of Service ("Terms") govern your use of the BookCircuit website and services. By accessing or using our services, you agree to be bound by these Terms. If you disagree with any part of the Terms, you may not access our services.
+              Welcome to Turtle Turning Pages. These Terms of Service ("Terms") govern your use of the Turtle Turning Pages website and services. By accessing or using our services, you agree to be bound by these Terms. If you disagree with any part of the Terms, you may not access our services.
             </p>
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">2. Company Information</h2>
             <p>
-              BookCircuit is operated by:
+              Turtle Turning Pages is operated by:
             </p>
             <p>
-              BookCircuit GmbH<br />
+              Turtle Turning Pages GmbH<br />
               Musterstraße 123<br />
               10115 Berlin<br />
               Germany<br />
-              Email: info@bookcircuit.com<br />
+              Email: info@turtleturningpages.com<br />
               Commercial Register: Amtsgericht Berlin-Charlottenburg, HRB 123456<br />
               VAT ID: DE123456789<br />
               Managing Directors: [Name of Managing Directors]
@@ -41,7 +41,7 @@ const TermsOfService = () => {
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">4. Book Exchange Service</h2>
             <p>
-              BookCircuit provides a platform for users to exchange books with other users. We do not guarantee the condition, quality, or authenticity of books listed on our platform. Users are solely responsible for the accuracy of their book listings and the condition of books they offer to exchange.
+              Turtle Turning Pages provides a platform for users to exchange books with other users. We do not guarantee the condition, quality, or authenticity of books listed on our platform. Users are solely responsible for the accuracy of their book listings and the condition of books they offer to exchange.
             </p>
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">5. User Conduct</h2>
@@ -59,7 +59,7 @@ const TermsOfService = () => {
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">6. Intellectual Property Rights</h2>
             <p>
-              The content, features, and functionality of our services are owned by BookCircuit and are protected by copyright, trademark, and other intellectual property laws. You may not copy, modify, distribute, sell, or lease any part of our services without our explicit permission.
+              The content, features, and functionality of our services are owned by Turtle Turning Pages and are protected by copyright, trademark, and other intellectual property laws. You may not copy, modify, distribute, sell, or lease any part of our services without our explicit permission.
             </p>
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">7. User Content</h2>
@@ -69,7 +69,7 @@ const TermsOfService = () => {
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">8. Limitation of Liability</h2>
             <p>
-              To the maximum extent permitted by law, BookCircuit shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses.
+              To the maximum extent permitted by law, Turtle Turning Pages shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses.
             </p>
             
             <h2 className="text-2xl font-semibold mb-4 mt-8">9. Warranty Disclaimer</h2>
@@ -107,11 +107,11 @@ const TermsOfService = () => {
               If you have any questions about these Terms, please contact us at:
             </p>
             <p>
-              BookCircuit GmbH<br />
+              Turtle Turning Pages GmbH<br />
               Musterstraße 123<br />
               10115 Berlin<br />
               Germany<br />
-              Email: legal@bookcircuit.com
+              Email: legal@turtleturningpages.com
             </p>
           </div>
         </div>

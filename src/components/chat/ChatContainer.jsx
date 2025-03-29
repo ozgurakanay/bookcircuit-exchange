@@ -441,8 +441,8 @@ const ChatContainer = ({ userId, selectedConversationId }) => {
   }
 
   return (
-    <div className="flex h-[calc(100vh-140px)] border rounded-lg overflow-hidden">
-      <div className="w-1/3 border-r overflow-y-auto bg-background">
+    <div className="flex h-[calc(100vh-140px)] border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+      <div className="w-1/3 border-r border-gray-200 overflow-y-auto bg-white">
         <ConversationList 
           conversations={conversations}
           selectedConversationId={selectedConversation?.id}
@@ -452,7 +452,7 @@ const ChatContainer = ({ userId, selectedConversationId }) => {
         />
       </div>
 
-      <div className="w-2/3 flex flex-col bg-muted/40">
+      <div className="w-2/3 flex flex-col bg-white">
         {selectedConversation ? (
           <>
             <ChatHeader 
@@ -463,13 +463,16 @@ const ChatContainer = ({ userId, selectedConversationId }) => {
               messages={messages} 
               currentUserId={userId} 
               loading={messageLoading}
+              hasMore={hasMoreMessages}
+              onLoadOlder={handleLoadOlderMessages}
             />
             <MessageInput 
               onSendMessage={handleSendMessage} 
+              conversationId={selectedConversation?.id}
             />
           </>
         ) : (
-          <div className="flex-grow flex items-center justify-center text-muted-foreground">
+          <div className="flex-grow flex items-center justify-center text-gray-500">
             {loading ? (
                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             ) : conversations.length > 0 ? (

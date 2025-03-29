@@ -41,8 +41,8 @@ const ChatHeader = ({ conversation, onBack, bookId }) => {
   if (!conversation) return null;
 
   return (
-    <div className="flex items-center p-3 border-b bg-card shadow-sm sticky top-0 z-10">
-      <button onClick={onBack} className="mr-3 md:hidden">
+    <div className="flex items-center p-3 border-b border-book-leather/20 bg-white shadow-sm sticky top-0 z-10">
+      <button onClick={onBack} className="mr-3 md:hidden text-book-dark">
         <ArrowLeft className="h-6 w-6" />
       </button>
       
@@ -50,20 +50,20 @@ const ChatHeader = ({ conversation, onBack, bookId }) => {
       {conversation.avatar ? (
         <img src={conversation.avatar} alt={conversation.name} className="w-10 h-10 rounded-full mr-4 object-cover" />
       ) : (
-        <div className="w-10 h-10 rounded-full bg-muted-foreground/30 flex items-center justify-center text-muted-foreground font-medium mr-4">
+        <div className="w-10 h-10 rounded-full bg-book-leather/20 flex items-center justify-center text-book-leather font-medium mr-4">
           {conversation.name ? conversation.name.charAt(0).toUpperCase() : '-'}
         </div>
       )}
 
       <div className="flex-1 min-w-0">
-        <h2 className="text-lg font-semibold truncate">{conversation.name}</h2>
+        <h2 className="text-lg font-semibold truncate text-book-dark">{conversation.name}</h2>
         {/* Optionally display status or other info here */}
       </div>
 
       {/* Book Info Button - Conditionally rendered */}
       {bookId && (
-        <button onClick={() => setShowBookDetails(true)} className="ml-auto p-2 rounded-full hover:bg-muted">
-          <Info className="h-5 w-5 text-muted-foreground" />
+        <button onClick={() => setShowBookDetails(true)} className="ml-auto p-2 rounded-full hover:bg-book-warm-cream/50">
+          <Info className="h-5 w-5 text-book-leather" />
         </button>
       )}
       

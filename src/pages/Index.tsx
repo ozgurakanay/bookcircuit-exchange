@@ -44,7 +44,7 @@ const Index = () => {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4">Features Built for Book Lovers</h2>
             <p className="text-book-dark/70 text-lg">
-              Discover all the ways BookCircuit makes book trading simple, secure, and social
+              Discover all the ways Turtle Turning Pages makes book trading simple, secure, and social
             </p>
           </div>
           
@@ -87,11 +87,11 @@ const Index = () => {
       <HowItWorks />
       
       {/* Testimonial/Stats Section */}
-      <section className="py-20 bg-gradient-to-br from-book-accent/5 to-purple-400/5">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4">Join a Growing Community</h2>
-            <p className="text-book-dark/70 text-lg">
+            <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-book-leather">Join a Growing Community</h2>
+            <p className="text-book-dark/80 text-lg">
               Thousands of book lovers are already trading and connecting
             </p>
           </div>
@@ -99,15 +99,15 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             <div className="glass-card rounded-2xl p-8 text-center">
               <div className="text-4xl font-bold font-serif text-book-accent mb-2">10,000+</div>
-              <p className="text-book-dark/70">Active Users</p>
+              <p className="text-book-dark/80">Active Users</p>
             </div>
             <div className="glass-card rounded-2xl p-8 text-center">
               <div className="text-4xl font-bold font-serif text-book-accent mb-2">50,000+</div>
-              <p className="text-book-dark/70">Books Traded</p>
+              <p className="text-book-dark/80">Books Traded</p>
             </div>
             <div className="glass-card rounded-2xl p-8 text-center">
               <div className="text-4xl font-bold font-serif text-book-accent mb-2">500+</div>
-              <p className="text-book-dark/70">Cities</p>
+              <p className="text-book-dark/80">Cities</p>
             </div>
           </div>
           
@@ -122,10 +122,10 @@ const Index = () => {
               </div>
               <div>
                 <p className="text-lg md:text-xl italic text-book-dark/80 mb-4">
-                  "BookCircuit has transformed how I read. I've discovered amazing books from people in my neighborhood and made friends who share my taste in literature. It's like having a community library right at my fingertips!"
+                  "Turtle Turning Pages has transformed how I read. I've discovered amazing books from people in my neighborhood and made friends who share my taste in literature. It's like having a community library right at my fingertips!"
                 </p>
                 <div>
-                  <h4 className="font-medium">Sarah J.</h4>
+                  <h4 className="font-medium text-book-leather">Sarah J.</h4>
                   <p className="text-book-dark/60 text-sm">Book lover from Portland</p>
                 </div>
               </div>
@@ -135,37 +135,37 @@ const Index = () => {
       </section>
       
       {/* FAQ Section */}
-      <section id="faq" className="py-20 bg-book-paper">
+      <section id="faq" className="py-20 bg-book-warm-cream">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4">Frequently Asked Questions</h2>
-            <p className="text-book-dark/70 text-lg">
-              Everything you need to know about BookCircuit
+            <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-book-leather">Frequently Asked Questions</h2>
+            <p className="text-book-dark/80 text-lg">
+              Everything you need to know about Turtle Turning Pages
             </p>
           </div>
           
           <div className="max-w-3xl mx-auto grid gap-6">
             <div className="glass-card rounded-xl p-6">
-              <h3 className="text-xl font-semibold font-serif mb-3">Is BookCircuit free to use?</h3>
-              <p className="text-book-dark/70">
-                Yes, BookCircuit is completely free to use for finding, listing, and trading books with people in your area.
+              <h3 className="text-xl font-semibold font-serif mb-3 text-book-leather">Is Turtle Turning Pages free to use?</h3>
+              <p className="text-book-dark/80">
+                Yes, Turtle Turning Pages is completely free to use for finding, listing, and trading books with people in your area.
               </p>
             </div>
             <div className="glass-card rounded-xl p-6">
-              <h3 className="text-xl font-semibold font-serif mb-3">How does the location feature work?</h3>
-              <p className="text-book-dark/70">
-                BookCircuit uses geofencing to show you books available within your preferred radius. You can set this distance in your profile settings.
+              <h3 className="text-xl font-semibold font-serif mb-3 text-book-leather">How does the location feature work?</h3>
+              <p className="text-book-dark/80">
+                Turtle Turning Pages uses geofencing to show you books available within your preferred radius. You can set this distance in your profile settings.
               </p>
             </div>
             <div className="glass-card rounded-xl p-6">
-              <h3 className="text-xl font-semibold font-serif mb-3">Is my personal information secure?</h3>
-              <p className="text-book-dark/70">
+              <h3 className="text-xl font-semibold font-serif mb-3 text-book-leather">Is my personal information secure?</h3>
+              <p className="text-book-dark/80">
                 We take privacy seriously. Your exact location is never shared with other users, only the general area. Personal details are only revealed when you choose to connect with another user.
               </p>
             </div>
             <div className="glass-card rounded-xl p-6">
-              <h3 className="text-xl font-semibold font-serif mb-3">What if I can't find the book I'm looking for?</h3>
-              <p className="text-book-dark/70">
+              <h3 className="text-xl font-semibold font-serif mb-3 text-book-leather">What if I can't find the book I'm looking for?</h3>
+              <p className="text-book-dark/80">
                 You can add books to your "Wanted" list, and you'll be notified when someone in your area adds that book to their collection.
               </p>
             </div>
@@ -174,11 +174,11 @@ const Index = () => {
       </section>
       
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-book-accent to-purple-500 text-white">
+      <section className="py-20 bg-book-warm-cream text-book-dark">
         <div className="container mx-auto px-4 md:px-6 text-center">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold font-serif mb-6">Ready to Start Trading Books?</h2>
-            <p className="text-white/90 text-lg mb-8 md:mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold font-serif mb-6 text-book-leather">Ready to Start Trading Books?</h2>
+            <p className="text-book-dark/90 text-lg mb-8 md:mb-10">
               Join thousands of readers exchanging books and stories in your community. Get started today — it's free!
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -186,7 +186,7 @@ const Index = () => {
                 <Button 
                   size="lg" 
                   variant="primary"
-                  className="bg-white text-book-accent border-2 border-white hover:bg-transparent hover:text-white transition-colors duration-300"
+                  className="bg-book-leather text-white border-2 border-book-leather hover:bg-transparent hover:text-book-leather transition-colors duration-300"
                 >
                   Create Your Account
                 </Button>
@@ -195,28 +195,12 @@ const Index = () => {
                 <Button 
                   size="lg" 
                   variant="outline"
-                  className="border-2 border-white text-white hover:bg-white hover:text-book-accent transition-colors duration-300"
+                  className="border-2 border-book-leather text-book-leather hover:bg-book-leather hover:text-white transition-colors duration-300"
                 >
                   Learn More
                 </Button>
               </a>
             </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* Security Badge Section */}
-      <section className="py-8 bg-white">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-book-dark/60">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4" />
-              <span>SSL Secured</span>
-            </div>
-            <div className="hidden md:block w-1 h-1 rounded-full bg-book-dark/20"></div>
-            <div>Privacy Protected</div>
-            <div className="hidden md:block w-1 h-1 rounded-full bg-book-dark/20"></div>
-            <div>©2023 BookCircuit Inc.</div>
           </div>
         </div>
       </section>

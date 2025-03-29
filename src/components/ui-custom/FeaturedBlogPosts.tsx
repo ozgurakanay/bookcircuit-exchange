@@ -45,12 +45,12 @@ const FeaturedBlogPosts: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="py-16 bg-book-paper">
+      <div className="py-16 bg-book-warm-cream">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4">Latest From Our Blog</h2>
-            <p className="text-book-dark/70 text-lg">
-              Insights, stories, and updates from the BookCircuit community
+            <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-book-leather">Latest From Our Blog</h2>
+            <p className="text-book-dark/80 text-lg">
+              Insights, stories, and updates from the Turtle Turning Pages community
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -71,18 +71,18 @@ const FeaturedBlogPosts: React.FC = () => {
 
   if (error) {
     return (
-      <div className="py-16 bg-book-paper">
+      <div className="py-16 bg-book-warm-cream">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
             <div className="flex items-center justify-center mb-4">
               <AlertCircle className="text-book-accent h-8 w-8" />
             </div>
-            <h2 className="text-2xl font-semibold mb-2">Something went wrong</h2>
-            <p className="text-book-dark/70 mb-6">{error}</p>
+            <h2 className="text-2xl font-semibold mb-2 text-book-leather">Something went wrong</h2>
+            <p className="text-book-dark/80 mb-6">{error}</p>
             <Button 
               variant="secondary" 
               onClick={() => window.location.reload()} 
-              className="px-6"
+              className="px-6 bg-book-leather text-white hover:bg-book-leather/90"
             >
               Try Again
             </Button>
@@ -97,12 +97,12 @@ const FeaturedBlogPosts: React.FC = () => {
   }
 
   return (
-    <div className="py-16 bg-book-paper">
+    <div className="py-16 bg-book-warm-cream">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4">Latest From Our Blog</h2>
-          <p className="text-book-dark/70 text-lg">
-            Insights, stories, and updates from the BookCircuit community
+          <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-book-leather">Latest From Our Blog</h2>
+          <p className="text-book-dark/80 text-lg">
+            Insights, stories, and updates from the Turtle Turning Pages community
           </p>
         </div>
         
@@ -116,7 +116,7 @@ const FeaturedBlogPosts: React.FC = () => {
           <Link to="/blog">
             <Button 
               variant="secondary" 
-              className="px-6"
+              className="px-6 bg-book-leather text-white hover:bg-book-leather/90"
             >
               View all blog posts
             </Button>

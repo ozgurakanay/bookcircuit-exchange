@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -7,33 +6,43 @@
 
 @layer base {
   :root {
-    --background: 30 33% 99%;
-    --foreground: 222 47% 11%;
+    --background: 36 67% 97%; /* #FCF7F0 Light Cream */
+    --foreground: 0 0% 17%; /* #2C2C2C Primary Dark Text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 0 0% 100%; /* #FFFFFF Pure White */
+    --card-foreground: 0 0% 17%; /* #2C2C2C Primary Dark Text */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 0 0% 100%; /* #FFFFFF Pure White */
+    --popover-foreground: 0 0% 17%; /* #2C2C2C Primary Dark Text */
 
-    --primary: 262 81% 75%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 20 35% 52%; /* #A47864 Main Color */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF White text for contrast */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 134 12% 49%; /* #6B8F71 Muted Forest Green */
+    --secondary-foreground: 0 0% 100%; /* #FFFFFF White text for contrast */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 36 67% 97%; /* #FCF7F0 Light Cream */
+    --muted-foreground: 0 0% 35%; /* #5A5A5A Secondary Medium Grey Text */
 
-    --accent: 264 80% 75%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 21 65% 54%; /* #D17A42 Rusty Orange */
+    --accent-foreground: 0 0% 100%; /* #FFFFFF White text for contrast */
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 262 81% 75%;
+    --border: 20 35% 52%; /* #A47864 Main Color */
+    --input: 20 35% 52%; /* #A47864 Main Color */
+    --ring: 21 65% 54%; /* #D17A42 Rusty Orange */
+
+    /* Sidebar Colors */
+    --sidebar-background: 36 67% 97%; /* #FCF7F0 Light Cream */
+    --sidebar-foreground: 0 0% 17%; /* #2C2C2C Primary Dark Text */
+    --sidebar-primary: 20 35% 52%; /* #A47864 Main Color */
+    --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF */
+    --sidebar-accent: 21 65% 54%; /* #D17A42 Rusty Orange */
+    --sidebar-accent-foreground: 0 0% 100%; /* #FFFFFF */
+    --sidebar-border: 20 35% 52%; /* #A47864 Main Color */
+    --sidebar-ring: 21 65% 54%; /* #D17A42 Rusty Orange */
 
     --radius: 0.75rem;
   }
@@ -67,11 +76,11 @@
 
 @layer components {
   .hero-gradient {
-    @apply bg-gradient-to-br from-book-paper via-book-light to-book-warm-cream;
+    @apply bg-gradient-to-br from-book-paper via-white to-book-warm-cream;
   }
   
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-book-accent to-purple-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-book-dark to-book-light;
   }
   
   .glass-card {

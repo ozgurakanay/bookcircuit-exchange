@@ -192,7 +192,7 @@ const Home = () => {
       <Navbar />
       
       <main className="flex-grow container mx-auto px-4 pt-36 pb-8">
-        <h1 className="text-3xl md:text-4xl font-bold font-serif mb-8">Welcome to BookCircuit</h1>
+        <h1 className="text-3xl md:text-4xl font-bold font-serif mb-8">Welcome to Turtle Turning Pages</h1>
         
         {/* Search Form */}
         <Card className="mb-10">
