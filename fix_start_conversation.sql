@@ -1,0 +1,1 @@
+-- Update the start_conversation function to set created_by and properly handle initial messages

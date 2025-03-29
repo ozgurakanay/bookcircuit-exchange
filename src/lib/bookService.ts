@@ -318,73 +318,53 @@ export const searchBooksByParams = async (
   }
 ): Promise<Book[]> => {
   try {
-    // For location-based search, use the get_books_with_distances RPC function
+    // For location-based search, use the books_within_distance RPC function
     if (params.latitude && params.longitude && params.radius) {
       // Convert radius from km to meters for the query
       const radiusInMeters = params.radius * 1000;
       
-      console.log('Performing geographic search with params:', {
-        lat: params.latitude,
-        lng: params.longitude,
-        max_distance_km: params.radius
+      console.log('[bookService] Performing geographic search with params:', {
+        search_lat: params.latitude,
+        search_lng: params.longitude,
+        max_distance_meters: radiusInMeters
       });
       
-      // Use the improved debugging function that returns distances
-      const { data, error } = await supabase.rpc('get_books_with_distances', {
-        lat: params.latitude,
-        lng: params.longitude,
-        max_distance_km: params.radius
+      // Use the correct function name and parameters matching the updated SQL
+      const { data, error } = await supabase.rpc('books_within_distance', {
+        search_lat: params.latitude,
+        search_lng: params.longitude,
+        max_distance_meters: radiusInMeters
       });
       
       if (error) {
-        console.error('Error performing geographic search:', error);
+        console.error('[bookService] Error performing geographic search:', error);
         
         // Fall back to regular search if geographic search fails
+        console.log('[bookService] Falling back to non-geographic search due to error.');
         return fallbackSearch(params);
       } else {
-        console.log('Geographic search succeeded, returned data:', data);
+        console.log('[bookService] Geographic search succeeded.');
         
-        // Process the data to merge it with regular book fields
-        if (data && data.length > 0) {
-          // Extract book IDs for detailed lookup
-          const bookIds = data.map(item => item.id);
-          
-          // Fetch full book details
-          const { data: bookData, error: bookError } = await supabase
-            .from('books')
-            .select('*')
-            .in('id', bookIds);
-            
-          if (bookError || !bookData) {
-            console.error('Error fetching detailed book data:', bookError);
-            return [];
-          }
-          
-          // Create a map of distance data by book ID
-          const distanceMap: Record<string, { distance_meters: number, distance_km: number }> = {};
-          data.forEach(item => {
-            distanceMap[item.id] = {
-              distance_meters: item.distance_meters,
-              distance_km: item.distance_km
-            };
-          });
-          
-          // Merge distance data with book data and sort by distance
-          const booksWithDistances = bookData.map(book => ({
-            ...book,
-            distance_meters: distanceMap[book.id]?.distance_meters,
-            distance_km: distanceMap[book.id]?.distance_km
-          }));
-          
-          // Sort by distance
-          return booksWithDistances.sort((a, b) => 
-            (a.distance_meters || Infinity) - (b.distance_meters || Infinity)
-          );
+        // The function now returns books + calculated_distance_meters
+        const results = (Array.isArray(data) ? data : []) as (Book & { calculated_distance_meters: number })[];
+        
+        // Log the results including the distance
+        console.log('[bookService] Returned data:', results.map(r => ({ 
+          id: r.id, 
+          title: r.title, 
+          calculated_distance_meters: r.calculated_distance_meters 
+        })));
+        
+        if (results.length === 0) {
+          console.log('[bookService] Geographic search returned no results.');
         }
-        return [];
+        
+        // Results are already sorted by distance by the SQL function
+        return results;
       }
     } else {
       // For non-geographic searches, use regular query
+      console.log('[bookService] Performing non-geographic search.');
       return fallbackSearch(params);
     }
   } catch (error) {
@@ -434,9 +414,9 @@ const fallbackSearch = async (params: {
 
 // Request a book
 export const requestBook = async (
-  bookId: string, 
+  bookId: string,
   requesterId: string
-): Promise<{ success: boolean; error?: string }> => {
+): Promise<{ success: boolean; requestId?: string; error?: string }> => {
   try {
     // First, check if the book exists
     const { data: book, error: bookError } = await supabase
@@ -467,7 +447,7 @@ export const requestBook = async (
     }
     
     // Create the request
-    const { error: requestError } = await supabase
+    const { data: newRequestData, error: requestError } = await supabase
       .from('book_requests')
       .insert([
         {
@@ -476,10 +456,12 @@ export const requestBook = async (
           owner_id: book.user_id,
           status: 'pending'
         }
-      ]);
+      ])
+      .select('id')
+      .single();
       
-    if (requestError) {
-      return { success: false, error: requestError.message };
+    if (requestError || !newRequestData) {
+      return { success: false, error: requestError?.message || 'Failed to create request or retrieve ID' };
     }
     
     // Create a notification for the book owner
@@ -500,20 +482,97 @@ export const requestBook = async (
       // We'll consider the request successful even if notification fails
     }
     
-    return { success: true };
+    return { success: true, requestId: newRequestData.id };
   } catch (error) {
     console.error('Error requesting book:', error);
     return { success: false, error: 'An unexpected error occurred' };
   }
 };
 
+// Cancel a book request
+export const cancelBookRequest = async (
+  requestId: string,
+  requesterId: string // Ensure only the requester can cancel
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    // First, verify the request exists and belongs to the requester
+    const { data: request, error: fetchError } = await supabase
+      .from('book_requests')
+      .select('id, requester_id')
+      .eq('id', requestId)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching book request for cancellation:', fetchError);
+      return { success: false, error: 'Request not found or error fetching it.' };
+    }
+
+    if (!request) {
+      return { success: false, error: 'Request not found.' };
+    }
+
+    if (request.requester_id !== requesterId) {
+      return { success: false, error: 'You are not authorized to cancel this request.' };
+    }
+
+    // Proceed with deletion
+    console.log(`[cancelBookRequest] Attempting to delete request ID: ${requestId} for user: ${requesterId}`); 
+    const deleteResponse = await supabase // Store the whole response
+      .from('book_requests')
+      .delete()
+      .eq('id', requestId);
+
+    // Log the entire response object
+    console.log(`[cancelBookRequest] Raw delete response: ${JSON.stringify(deleteResponse)}`);
+
+    const { error: deleteError, count } = deleteResponse; // Destructure after logging
+
+    // Keep previous log for context
+    console.log(`[cancelBookRequest] Delete operation result - Error: ${JSON.stringify(deleteError)}, Count: ${count}`);
+
+    if (deleteError) {
+      console.error('Error deleting book request:', deleteError);
+      return { success: false, error: deleteError.message };
+    }
+
+    // Optionally: Delete related notification? 
+    // For now, we'll leave notifications as they might still be relevant history.
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error cancelling book request:', error);
+    return { success: false, error: 'An unexpected error occurred during cancellation.' };
+  }
+};
+
 // Get requested books for a user
 export const getUserRequestedBooks = async (userId: string): Promise<Book[]> => {
   try {
+    // First get all book requests made by this user
     const { data, error } = await supabase
       .from('book_requests')
       .select(`
-        books:book_id(*)
+        id,
+        book_id,
+        owner_id,
+        status,
+        created_at,
+        books:book_id (
+          id, 
+          title, 
+          author, 
+          description, 
+          condition, 
+          cover_img_url, 
+          location_text,
+          postal_code,
+          created_at
+        ),
+        owners:owner_id (
+          id,
+          full_name,
+          avatar_url
+        )
       `)
       .eq('requester_id', userId);
     
@@ -522,9 +581,21 @@ export const getUserRequestedBooks = async (userId: string): Promise<Book[]> => 
       return [];
     }
     
-    // Transform the data to get the books
-    const books = data?.map(item => item.books as unknown as Book) || [];
-    return books;
+    // Transform the data to get the books with additional request information
+    const requestedBooks = data?.map(item => {
+      const book = item.books as unknown as Book;
+      // Add owner information to the book
+      if (book) {
+        book.owner = item.owners;
+        // Add request information
+        book.request_id = item.id;
+        book.request_status = item.status;
+        book.request_date = item.created_at;
+      }
+      return book;
+    }).filter(Boolean) || [];
+    
+    return requestedBooks;
   } catch (error) {
     console.error('Error fetching requested books:', error);
     return [];

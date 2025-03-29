@@ -2,7 +2,7 @@ import React from 'react';
 import { Book } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, MapPin, Edit, Trash2, MoreVertical } from 'lucide-react';
+import { BookOpen, MapPin, Edit, Trash2, MoreVertical, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -17,9 +17,10 @@ import { deleteBook } from '@/lib/bookService';
 interface BookCardProps {
   book: Book;
   onDelete?: () => void;
+  isReadOnly?: boolean;
 }
 
-const BookCard: React.FC<BookCardProps> = ({ book, onDelete }) => {
+const BookCard: React.FC<BookCardProps> = ({ book, onDelete, isReadOnly = false }) => {
   const navigate = useNavigate();
   const [deleting, setDeleting] = React.useState(false);
 
@@ -65,31 +66,33 @@ const BookCard: React.FC<BookCardProps> = ({ book, onDelete }) => {
 
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow relative">
-      {/* Action menu */}
-      <div className="absolute top-2 right-2 z-10">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 bg-black/20 hover:bg-black/40 text-white rounded-full">
-              <MoreVertical className="h-4 w-4" />
-              <span className="sr-only">Actions</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleEdit}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={handleDelete}
-              disabled={deleting}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              {deleting ? 'Removing...' : 'Remove'}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      {/* Action menu - only shown if not readonly */}
+      {!isReadOnly && (
+        <div className="absolute top-2 right-2 z-10">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 bg-black/20 hover:bg-black/40 text-white rounded-full">
+                <MoreVertical className="h-4 w-4" />
+                <span className="sr-only">Actions</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleEdit}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={handleDelete}
+                disabled={deleting}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                {deleting ? 'Removing...' : 'Remove'}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
       
       <div className="relative pt-[60%] bg-muted">
         {book.cover_img_url ? (
@@ -129,10 +132,18 @@ const BookCard: React.FC<BookCardProps> = ({ book, onDelete }) => {
       </CardContent>
       
       <CardFooter className="pt-0 text-sm text-muted-foreground">
-        <div className="flex items-center">
+        <div className="flex items-center flex-grow">
           <MapPin className="h-3.5 w-3.5 mr-1" />
-          <span className="line-clamp-1">{book.location_text}</span>
+          <span className="line-clamp-1">{book.postal_code || book.location_text}</span>
         </div>
+        
+        {/* Show owner name if available and in read-only mode */}
+        {isReadOnly && book.owner && (
+          <div className="flex items-center ml-2">
+            <User className="h-3.5 w-3.5 mr-1" />
+            <span className="line-clamp-1">{book.owner.full_name || 'Unknown Owner'}</span>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );

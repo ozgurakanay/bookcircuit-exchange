@@ -6,7 +6,8 @@ import * as z from 'zod';
 import { Loader2, Search, BookPlus, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-
+import Navbar from '../components/ui-custom/Navbar';
+import Footer from '../components/ui-custom/Footer';
 import { supabase } from '../lib/supabase';
 import { searchBooks, formatBookData, addBook } from '../lib/bookService';
 import { BookCondition, OpenLibraryBook, LocationData } from '../lib/types';
@@ -271,310 +272,314 @@ export default function AddBook() {
   };
 
   return (
-    <div className="container max-w-4xl py-10">
-      <h1 className="text-3xl font-bold mb-6">Add a Book</h1>
-      
-      {/* Book Search Section */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Search for a Book</CardTitle>
-          <CardDescription>
-            Find a book by title, author, or ISBN to auto-fill the form
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Search by title, author, or ISBN..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-1"
-            />
-            <Button onClick={handleSearch} disabled={searching}>
-              {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-              Search
-            </Button>
-          </div>
-          
-          {/* Search Results */}
-          {searchResults.length > 0 && (
-            <div className="mt-4 border rounded-md divide-y">
-              {searchResults.map((book, index) => (
-                <div 
-                  key={index} 
-                  className="p-3 hover:bg-muted cursor-pointer flex items-start gap-3"
-                  onClick={() => handleSelectBook(book)}
-                >
-                  {book.covers?.[0] && (
-                    <img 
-                      src={`https://covers.openlibrary.org/b/id/${book.covers[0]}-M.jpg`} 
-                      alt={book.title}
-                      className="w-12 h-16 object-cover rounded"
-                    />
-                  )}
-                  {!book.covers?.[0] && book.cover_i && (
-                    <img 
-                      src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`} 
-                      alt={book.title}
-                      className="w-12 h-16 object-cover rounded"
-                    />
-                  )}
-                  <div>
-                    <h3 className="font-medium">{book.title}</h3>
-                    {book.authors?.[0] && <p className="text-sm text-muted-foreground">{book.authors[0].name}</p>}
-                    {book.publish_date && <p className="text-xs text-muted-foreground">Published: {book.publish_date}</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          
-          {/* Selected Book Preview */}
-          {selectedBook && (
-            <div className="mt-4 p-4 border rounded-md bg-muted/30">
-              <h3 className="text-lg font-medium mb-2">Selected Book</h3>
-              <div className="flex gap-4">
-                <div className="relative">
-                  {form.getValues('cover_img_url') && (
-                    <img 
-                      src={form.getValues('cover_img_url')} 
-                      alt={form.getValues('title')}
-                      className="w-24 h-32 object-cover rounded" 
-                    />
-                  )}
-                  <div className="mt-2 flex flex-col gap-2">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full text-xs"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <Upload className="h-3 w-3 mr-1" />
-                      Custom Cover
-                    </Button>
-                    {customImagePreview && (
-                      <Button 
-                        type="button" 
-                        variant="destructive" 
-                        size="sm" 
-                        className="w-full text-xs"
-                        onClick={handleRemoveCustomImage}
-                      >
-                        <X className="h-3 w-3 mr-1" />
-                        Remove
-                      </Button>
-                    )}
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      ref={fileInputRef}
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-lg">{form.getValues('title')}</p>
-                  {form.getValues('author') ? (
-                    <p className="text-sm font-medium text-muted-foreground">
-                      <span className="font-semibold">Author:</span> {form.getValues('author')}
-                    </p>
-                  ) : null}
-                  {form.getValues('isbn') ? (
-                    <p className="text-sm font-medium text-muted-foreground">
-                      <span className="font-semibold">ISBN:</span> {form.getValues('isbn')}
-                    </p>
-                  ) : null}
-                  {form.getValues('description') && (
-                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                      {form.getValues('description')}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">
-                All fields have been automatically filled. You can edit them or upload a custom cover image.
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      
-      {/* Book Form */}
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Book title" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Navbar />
+      <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 flex-grow">
+        <h1 className="text-3xl font-bold text-center mb-8">Add a Book to Your Collection</h1>
+        
+        {/* Book Search Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Search for a Book</CardTitle>
+            <CardDescription>
+              Find a book by title, author, or ISBN to auto-fill the form
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Search by title, author, or ISBN..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="flex-1"
               />
-              
-              <FormField
-                control={form.control}
-                name="author"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Author</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Author name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="location_text"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location *</FormLabel>
-                    <FormControl>
-                      <PostalCodeAutocomplete
-                        value={field.value}
-                        onChange={handleLocationChange}
-                        placeholder="Enter a postal code or address..."
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="condition"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Condition *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select condition" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="New">New</SelectItem>
-                        <SelectItem value="Like New">Like New</SelectItem>
-                        <SelectItem value="Good">Good</SelectItem>
-                        <SelectItem value="Fair">Fair</SelectItem>
-                        <SelectItem value="Poor">Poor</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="isbn"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ISBN</FormLabel>
-                    <FormControl>
-                      <Input placeholder="ISBN (optional)" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <Button onClick={handleSearch} disabled={searching}>
+                {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                Search
+              </Button>
             </div>
             
-            <div className="space-y-6">
-              <FormField
-                control={form.control}
-                name="cover_img_url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cover Image URL</FormLabel>
-                    <FormControl>
-                      <Input placeholder="URL to book cover (optional)" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    {field.value && (
-                      <div className="mt-2">
-                        <img 
-                          src={field.value} 
-                          alt="Book cover preview" 
-                          className="max-w-[120px] max-h-[180px] object-cover rounded border"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                      </div>
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div className="mt-4 border rounded-md divide-y">
+                {searchResults.map((book, index) => (
+                  <div 
+                    key={index} 
+                    className="p-3 hover:bg-muted cursor-pointer flex items-start gap-3"
+                    onClick={() => handleSelectBook(book)}
+                  >
+                    {book.covers?.[0] && (
+                      <img 
+                        src={`https://covers.openlibrary.org/b/id/${book.covers[0]}-M.jpg`} 
+                        alt={book.title}
+                        className="w-12 h-16 object-cover rounded"
+                      />
                     )}
-                    <div className="mt-2">
+                    {!book.covers?.[0] && book.cover_i && (
+                      <img 
+                        src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`} 
+                        alt={book.title}
+                        className="w-12 h-16 object-cover rounded"
+                      />
+                    )}
+                    <div>
+                      <h3 className="font-medium">{book.title}</h3>
+                      {book.authors?.[0] && <p className="text-sm text-muted-foreground">{book.authors[0].name}</p>}
+                      {book.publish_date && <p className="text-xs text-muted-foreground">Published: {book.publish_date}</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {/* Selected Book Preview */}
+            {selectedBook && (
+              <div className="mt-4 p-4 border rounded-md bg-muted/30">
+                <h3 className="text-lg font-medium mb-2">Selected Book</h3>
+                <div className="flex gap-4">
+                  <div className="relative">
+                    {form.getValues('cover_img_url') && (
+                      <img 
+                        src={form.getValues('cover_img_url')} 
+                        alt={form.getValues('title')}
+                        className="w-24 h-32 object-cover rounded" 
+                      />
+                    )}
+                    <div className="mt-2 flex flex-col gap-2">
                       <Button 
                         type="button" 
                         variant="outline" 
                         size="sm" 
+                        className="w-full text-xs"
                         onClick={() => fileInputRef.current?.click()}
                       >
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload Cover Image
+                        <Upload className="h-3 w-3 mr-1" />
+                        Custom Cover
                       </Button>
-                    </div>
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Book description (optional)" 
-                        className="min-h-[150px]"
-                        {...field} 
+                      {customImagePreview && (
+                        <Button 
+                          type="button" 
+                          variant="destructive" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={handleRemoveCustomImage}
+                        >
+                          <X className="h-3 w-3 mr-1" />
+                          Remove
+                        </Button>
+                      )}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                        className="hidden"
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-lg">{form.getValues('title')}</p>
+                    {form.getValues('author') ? (
+                      <p className="text-sm font-medium text-muted-foreground">
+                        <span className="font-semibold">Author:</span> {form.getValues('author')}
+                      </p>
+                    ) : null}
+                    {form.getValues('isbn') ? (
+                      <p className="text-sm font-medium text-muted-foreground">
+                        <span className="font-semibold">ISBN:</span> {form.getValues('isbn')}
+                      </p>
+                    ) : null}
+                    {form.getValues('description') && (
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                        {form.getValues('description')}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  All fields have been automatically filled. You can edit them or upload a custom cover image.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        
+        {/* Book Form */}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Book title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="author"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Author</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Author name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="location_text"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location *</FormLabel>
+                      <FormControl>
+                        <PostalCodeAutocomplete
+                          value={field.value}
+                          onChange={handleLocationChange}
+                          placeholder="Enter a postal code or address..."
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="condition"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Condition *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select condition" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="New">New</SelectItem>
+                          <SelectItem value="Like New">Like New</SelectItem>
+                          <SelectItem value="Good">Good</SelectItem>
+                          <SelectItem value="Fair">Fair</SelectItem>
+                          <SelectItem value="Poor">Poor</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="isbn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ISBN</FormLabel>
+                      <FormControl>
+                        <Input placeholder="ISBN (optional)" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="cover_img_url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cover Image URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="URL to book cover (optional)" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                      {field.value && (
+                        <div className="mt-2">
+                          <img 
+                            src={field.value} 
+                            alt="Book cover preview" 
+                            className="max-w-[120px] max-h-[180px] object-cover rounded border"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div className="mt-2">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload Cover Image
+                        </Button>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Book description (optional)" 
+                          className="min-h-[150px]"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
-          </div>
-          
-          <div className="flex justify-end gap-4 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => navigate('/dashboard')}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Adding Book...
-                </>
-              ) : (
-                <>
-                  <BookPlus className="mr-2 h-4 w-4" />
-                  Add Book
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </Form>
+            
+            <div className="flex justify-end gap-4 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => navigate('/dashboard')}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Adding Book...
+                  </>
+                ) : (
+                  <>
+                    <BookPlus className="mr-2 h-4 w-4" />
+                    Add Book
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
+      <Footer />
     </div>
   );
 } 

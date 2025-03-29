@@ -8,12 +8,12 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "localhost",
     port: 8080,
+    strictPort: true,
     hmr: {
       protocol: 'ws',
       host: 'localhost',
-      port: 8080,
-      clientPort: 8080,
-      // Disable WebSocket compression which can cause RSV1 errors
+      port: 24678, // Use a different port for WebSocket
+      clientPort: 24678,
       overlay: false
     },
   },

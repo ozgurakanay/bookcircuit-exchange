@@ -29,6 +29,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { supabase } from '@/lib/supabase';
 import { PostalCodeAutocomplete } from '@/components/ui-custom/PostalCodeAutocomplete';
+import { Slider } from '@/components/ui/slider';
 
 // Form validation schema
 const searchFormSchema = z.object({
@@ -39,6 +40,34 @@ const searchFormSchema = z.object({
 });
 
 type SearchFormValues = z.infer<typeof searchFormSchema>;
+
+// --- START: Slider Mapping Logic ---
+const allowedRadii = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, // 1km steps up to 10km
+  15, 20, 25, 30, 35, 40, 45, 50, // 5km steps up to 50km
+  60, 70, 80, 90, 100             // 10km steps up to 100km
+];
+
+const mapSliderIndexToRadius = (index: number): number => {
+  // Clamp index to valid range
+  const clampedIndex = Math.max(0, Math.min(index, allowedRadii.length - 1));
+  return allowedRadii[clampedIndex];
+};
+
+const mapRadiusToSliderIndex = (radius: number): number => {
+  let closestIndex = 0;
+  let minDiff = Infinity;
+
+  allowedRadii.forEach((allowedRadius, index) => {
+    const diff = Math.abs(allowedRadius - radius);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closestIndex = index;
+    }
+  });
+  return closestIndex;
+};
+// --- END: Slider Mapping Logic ---
 
 const Home = () => {
   const { user } = useAuth();
@@ -228,15 +257,28 @@ const Home = () => {
                     name="radius"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Radius (km)</FormLabel>
+                        <FormLabel className="flex justify-between">
+                          <span>Radius (km)</span>
+                          <span className="text-sm font-medium text-muted-foreground">
+                            {field.value || form.formState.defaultValues?.radius} km
+                          </span>
+                        </FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
-                            min={1} 
-                            max={100} 
-                            placeholder="Search radius" 
-                            {...field} 
-                          />
+                          <div className="flex items-center h-10 px-3 rounded-md border border-input bg-background">
+                            <Slider
+                              name={field.name}
+                              value={[
+                                mapRadiusToSliderIndex(
+                                  field.value || form.formState.defaultValues?.radius || 10
+                                )
+                              ]}
+                              min={0}
+                              max={allowedRadii.length - 1}
+                              step={1}
+                              onValueChange={(value) => field.onChange(mapSliderIndexToRadius(value[0]))}
+                              className="w-full"
+                            />
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

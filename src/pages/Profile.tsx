@@ -129,18 +129,50 @@ const Profile = () => {
     
     const file = e.target.files[0];
     const fileExt = file.name.split('.').pop();
-    const filePath = `${user?.id}/avatar.${fileExt}`;
+    const fileName = `avatar-${Date.now()}.${fileExt}`; // Adding timestamp to create unique filenames
+    const filePath = `${user?.id}/${fileName}`;
     
     try {
       setAvatarUploading(true);
+      
+      // If we already have an avatar, try to remove it first
+      if (profile.avatar_url) {
+        try {
+          // Extract the old path from the URL
+          const urlParts = profile.avatar_url.split('/');
+          const oldFileName = urlParts[urlParts.length - 1];
+          const oldFilePath = `${user?.id}/${oldFileName}`;
+          
+          // Try to remove old file, but don't let it block the upload if it fails
+          await supabase
+            .storage
+            .from('avatars')
+            .remove([oldFilePath])
+            .catch(err => console.log('Note: Could not remove old avatar:', err.message));
+        } catch (removeError) {
+          // Just log it, don't prevent the upload of the new avatar
+          console.log('Failed to remove old avatar:', removeError);
+        }
+      }
       
       // Upload image to storage
       const { error: uploadError } = await supabase
         .storage
         .from('avatars')
-        .upload(filePath, file, { upsert: true });
+        .upload(filePath, file, { upsert: false }); // Changed to false since we're creating a new file
       
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        if (uploadError.message.includes('bucket') || uploadError.message.includes('Bucket')) {
+          throw new Error(
+            "Storage bucket not found. Please run the SQL setup script to create the avatars bucket."
+          );
+        } else if (uploadError.message.includes('security policy') || uploadError.message.includes('violates')) {
+          throw new Error(
+            "Permission denied. The storage security policies need to be updated."
+          );
+        }
+        throw uploadError;
+      }
       
       // Get public URL
       const { data } = supabase
@@ -149,6 +181,16 @@ const Profile = () => {
         .getPublicUrl(filePath);
       
       // Update profile with avatar URL
+      const { error: profileUpdateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: data.publicUrl })
+        .eq('id', user?.id);
+        
+      if (profileUpdateError) {
+        throw profileUpdateError;
+      }
+      
+      // Update local state
       setProfile(prev => ({
         ...prev,
         avatar_url: data.publicUrl

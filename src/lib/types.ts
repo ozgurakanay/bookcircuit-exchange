@@ -9,7 +9,6 @@ export type Profile = {
   avatar_url?: string;
   created_at: string;
   updated_at: string;
-  role: string; // 'user' or 'admin'
 };
 
 export type BookCondition = 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor';
@@ -32,6 +31,27 @@ export type Book = {
   // Optional distance fields for geographic searches
   distance_meters?: number;
   distance_km?: number;
+  // Optional request-related fields
+  owner?: any; // Profile information of the book owner
+  request_id?: string;
+  request_status?: BookRequestStatus;
+  request_date?: string;
+};
+
+export type BookRequestStatus = 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled';
+
+export type BookRequest = {
+  id: string;
+  book_id: string;
+  requester_id: string;
+  owner_id: string;
+  status: BookRequestStatus;
+  message?: string;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  book?: Book;
+  requester?: Profile;
 };
 
 // Blog post type

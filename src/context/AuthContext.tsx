@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
+import { supabase, profileClient } from '@/lib/supabase';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from "@/components/ui/use-toast";
 import { Profile } from '@/lib/types';
@@ -9,7 +9,6 @@ interface AuthContextProps {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
-  isAdmin: boolean;
   signUp: (email: string, password: string) => Promise<{ success: boolean; data?: any; error?: any }>;
   signIn: (email: string, password: string) => Promise<{ success: boolean; data?: any; error?: any }>;
   signOut: () => Promise<{ success: boolean; error?: any }>;
@@ -22,31 +21,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<any | null>(null);
   const navigate = useNavigate();
 
   // Fetch user profile from the database
   const fetchProfile = async (userId: string) => {
+    console.log('DEBUG: Starting fetchProfile for user:', userId);
     try {
-      const { data, error } = await supabase
+      // Use the profileClient with shorter timeout for faster queries
+      const { data, error } = await profileClient
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
-
+      console.log('DEBUG: fetchProfile response for user:', userId, data, error);
       if (error) {
-        console.error("Error fetching profile:", error.message);
-        
-        // If the profile does not exist, create one
-        if (error.code === 'PGRST116') { // Supabase's "not found" error
+        console.error('Error fetching profile:', error.message);
+        if (error.code === 'PGRST116') {
+          console.log('DEBUG: Profile not found for user, creating default profile');
           return await createDefaultProfile(userId);
         }
-        
         return null;
       }
 
+      console.log('DEBUG: Fetched profile data:', data);
       return data as Profile;
     } catch (error: any) {
-      console.error("Failed to fetch profile:", error.message);
+      console.error('Failed to fetch profile:', error.message);
       return null;
     }
   };
@@ -62,7 +63,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         favorite_genre: '',
         website: '',
         avatar_url: '',
-        role: 'user', // Default role
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -94,97 +94,133 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Modify the useEffect in AuthContext for more efficient handling
   useEffect(() => {
-    let isMounted = true;
+    let mounted = true;
+    let initialSessionChecked = false;
     
-    const checkAndSetSession = async () => {
+    // More efficient session check
+    async function getInitialSession() {
+      console.log('DEBUG: Starting auth session check');
+      setLoading(true);
+
       try {
-        setLoading(true);
         const { data, error } = await supabase.auth.getSession();
-        
+        console.log('DEBUG: getSession response:', data, error);
+
         if (error) {
-          console.error("Error fetching session:", error.message);
-          if (isMounted) {
-            setUser(null);
-            setProfile(null);
+          console.error('DEBUG: Error during getSession:', error);
+          setError(error);
+        } else if (data && data.session) {
+          console.log('DEBUG: Session found:', data.session);
+          if (mounted) {
+            setUser(data.session.user);
+            
+            // Fetch profile with a reduced timeout
+            try {
+              const profilePromise = fetchProfile(data.session.user.id);
+              const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Profile fetch timeout')), 2000)
+              );
+              
+              const profileData = await Promise.race([profilePromise, timeoutPromise])
+                .catch(err => {
+                  console.error('DEBUG: Profile fetch failed or timed out:', err);
+                  return null;
+                }) as Profile | null;
+                
+              if (mounted) {
+                console.log('DEBUG: Setting profile after fetch/timeout:', profileData);
+                setProfile(profileData);
+              }
+            } catch (profileError) {
+              console.error('DEBUG: Error in profile fetch block:', profileError);
+            }
           }
         } else {
-          const sessionUser = data?.session?.user || null;
+          console.log('DEBUG: No session data returned');
+        }
+      } catch (e) {
+        console.error('DEBUG: Unexpected error in getInitialSession:', e);
+      }
+      
+      // Mark initial session as checked to prevent duplicate work
+      initialSessionChecked = true;
+      
+      // Ensure loading is always set to false
+      if (mounted) {
+        console.log('DEBUG: Setting loading to false');
+        setLoading(false);
+      }
+    }
+
+    getInitialSession();
+
+    // Set up auth listener with optimized handling
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('DEBUG: Auth state changed:', event, session);
+        
+        // Skip duplicate processing if initial session is still being checked
+        if (!initialSessionChecked) {
+          console.log('DEBUG: Skipping auth state change handling - initial session check in progress');
+          return;
+        }
+        
+        if (mounted) {
+          // Only set loading true if we need to fetch a profile
+          const needsProfileFetch = session?.user && (!user || user.id !== session.user.id);
+          if (needsProfileFetch) {
+            setLoading(true);
+          }
           
-          if (isMounted) {
-            setUser(sessionUser);
-          
-            if (sessionUser) {
+          // Update user state
+          if (session && session.user) {
+            setUser(session.user);
+            
+            // Only fetch profile if user changed
+            if (needsProfileFetch) {
               try {
-                const profileData = await fetchProfile(sessionUser.id);
-                if (isMounted) {
+                // Reduced timeout for faster response
+                const profilePromise = fetchProfile(session.user.id);
+                const timeoutPromise = new Promise((_, reject) => 
+                  setTimeout(() => reject(new Error('Auth state change profile fetch timeout')), 2000)
+                );
+                
+                const profileData = await Promise.race([profilePromise, timeoutPromise])
+                  .catch(err => {
+                    console.error('DEBUG: Auth state change profile fetch failed or timed out:', err);
+                    return null;
+                  }) as Profile | null;
+                  
+                if (mounted) {
+                  console.log('DEBUG: Setting profile after auth state change:', profileData);
                   setProfile(profileData);
                 }
               } catch (profileError) {
-                console.error("Error fetching profile in checkAndSetSession:", profileError);
-                // Continue even if profile fetch fails
+                console.error('DEBUG: Error in auth state change profile fetch:', profileError);
+              } finally {
+                if (mounted) {
+                  console.log('DEBUG: Setting loading to false after auth state change');
+                  setLoading(false);
+                }
               }
-            } else {
-              setProfile(null);
+            }
+          } else {
+            setUser(null);
+            setProfile(null);
+            if (needsProfileFetch) {
+              setLoading(false);
             }
           }
-        }
-      } catch (error) {
-        console.error("Failed to check authentication status:", error);
-        if (isMounted) {
-          setUser(null);
-          setProfile(null);
-        }
-      } finally {
-        // Set loading to false regardless of outcome
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    // Immediately check session
-    checkAndSetSession();
-
-    // Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Auth state changed:", event, session?.user?.email);
-        
-        if (!isMounted) return;
-        
-        // Always set loading to true when auth state changes
-        setLoading(true);
-        
-        const currentUser = session?.user || null;
-        setUser(currentUser);
-        
-        if (currentUser) {
-          try {
-            const profileData = await fetchProfile(currentUser.id);
-            if (isMounted) {
-              setProfile(profileData);
-            }
-          } catch (error) {
-            console.error("Error fetching profile in auth state change:", error);
-            // Continue even if profile fetch fails
-          }
-        } else {
-          setProfile(null);
-        }
-        
-        // Always set loading to false after handling auth state change
-        if (isMounted) {
-          setLoading(false);
         }
       }
     );
 
+    // Cleanup function to run on unmount
     return () => {
-      isMounted = false;
-      if (authListener && typeof authListener.subscription?.unsubscribe === 'function') {
-        authListener.subscription.unsubscribe();
-      }
+      mounted = false;
+      authListener?.subscription?.unsubscribe();
     };
   }, []);
 
@@ -232,17 +268,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw error;
       }
       
-      // Fetch user profile after successful login
-      if (data?.user) {
-        try {
-          const profileData = await fetchProfile(data.user.id);
-          setProfile(profileData);
-        } catch (profileError) {
-          console.error("Error fetching profile after sign in:", profileError);
-          // Continue even if profile fetch fails
-        }
-      }
-      
       toast({ 
         title: "Welcome back!", 
         description: `Signed in as ${email}`,
@@ -273,7 +298,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw error;
       }
       
-      // Clear profile state
+      // Clear user and profile state
+      setUser(null);
       setProfile(null);
       
       toast({ 
@@ -291,14 +317,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // Check if user is an admin
-  const isAdmin = profile ? profile.role === 'admin' : false;
-
   const value = {
     user,
     profile,
     loading,
-    isAdmin,
     signUp,
     signIn,
     signOut,

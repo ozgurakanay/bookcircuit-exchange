@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import AdminRoute from "@/components/auth/AdminRoute";
 import Index from "./pages/Index";
 import GetStarted from "./pages/GetStarted";
 import SignIn from "./pages/SignIn";
@@ -22,7 +21,8 @@ import TestGeography from "./pages/TestGeography";
 import SimpleTest from "./pages/SimpleTest";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
-import Admin from "./pages/Admin";
+import BookDetail from "./pages/BookDetail";
+import Chat from "./pages/Chat";
 
 const queryClient = new QueryClient();
 
@@ -62,11 +62,16 @@ const App = () => (
                 <EditBook />
               </ProtectedRoute>
             } />
-            {/* Admin Route */}
-            <Route path="/admin" element={
-              <AdminRoute>
-                <Admin />
-              </AdminRoute>
+            <Route path="/books/:id" element={<BookDetail />} />
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <Chat />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat/:conversationId" element={
+              <ProtectedRoute>
+                <Chat />
+              </ProtectedRoute>
             } />
             <Route path="/simple-test" element={<SimpleTest />} />
             <Route path="/test-geography" element={
@@ -74,14 +79,11 @@ const App = () => (
                 <TestGeography />
               </ProtectedRoute>
             } />
-            {/* Blog Routes */}
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
-            {/* Legal Pages */}
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/cookie-policy" element={<CookiePolicy />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
